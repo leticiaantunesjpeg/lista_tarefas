@@ -6,23 +6,33 @@ class TarefaService {
 
 	private $conexao;
 	private $tarefa;
+	private $categoria;
+	
 
-	public function __construct(Conexao $conexao, Tarefa $tarefa) {
+	public function __construct(Conexao $conexao, Tarefa $tarefa, Tarefa $categoria) {
 		$this->conexao = $conexao->conectar();
 		$this->tarefa = $tarefa;
+		$this->categoria = $categoria;
 	}
 
-	public function inserir() { //create
-		$query = 'insert into tb_tarefas(tarefa)values(:tarefa)';
+	public function inserir() {
+		// Query para inserir uma nova tarefa com sua categoria na tabela tb_tarefas
+		$query = 'INSERT INTO tb_tarefas(tarefa, categoria) VALUES (:tarefa, :categoria)';
 		$stmt = $this->conexao->prepare($query);
+		
+		// Vincular os valores das variáveis tarefa e categoria aos parâmetros da consulta
 		$stmt->bindValue(':tarefa', $this->tarefa->__get('tarefa'));
+		$stmt->bindValue(':categoria', $this->categoria->__get('categoria'));
+		
+		// Executar a consulta preparada
 		$stmt->execute();
 	}
+	
 
 	public function recuperar() { //read
 		$query = '
 			select 
-				t.id, s.status, t.tarefa 
+				t.id, s.status, t.tarefa , t.categoria
 			from 
 				tb_tarefas as t
 				left join tb_status as s on (t.id_status = s.id)
