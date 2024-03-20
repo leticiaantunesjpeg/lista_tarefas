@@ -93,6 +93,13 @@ if ($acao == 'inserir') {
 	$tarefa = new Tarefa();
 	$conexao = new Conexao();
 	$tarefaService = new TarefaService($conexao, $tarefa, $categoria);
-	$tarefas = $tarefaService->ordenarPorDataCadastro();
+	$tarefas = $tarefaService->ordenarPorRecentes();
+	echo json_encode($tarefas);
+} else if ($acao == 'data_criacao_antigas') {
+	$categoria = new Tarefa();
+	$tarefa = new Tarefa();
+	$conexao = new Conexao();
+	$tarefaService = new TarefaService($conexao, $tarefa, $categoria);
+	$tarefas = $tarefaService->ordenarPorAntigas();
 	echo json_encode($tarefas);
 }

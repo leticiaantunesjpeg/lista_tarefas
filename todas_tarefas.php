@@ -82,17 +82,30 @@ require 'tarefa_controller.php';
 		}
 
 		function ordenarTarefas(criterio) {
-			fetch('tarefa_controller.php?acao=data_criacao_recente')
-				.then(response => response.json())
-				.then(data => {
-					console.log(data)
-					const tarefasContainer = document.querySelector('.col');
-					tarefasContainer.innerHTML = ''; // Limpar o conteúdo existente das tarefas
+			if (criterio === 'data_criacao_recente') {
+				fetch('tarefa_controller.php?acao=data_criacao_recente')
+					.then(response => response.json())
+					.then(data => {
+						const tarefasContainer = document.querySelector('.col');
+						tarefasContainer.innerHTML = '';
 
-					data.forEach(tarefa => {
-						const tarefaElement = document.createElement('div');
-						tarefaElement.className = 'row mb-3 d-flex align-items-center tarefa';
-						tarefaElement.innerHTML = `
+						const ordenacaoElement = document.createElement('div');
+						ordenacaoElement.innerHTML = `
+					<h4>Todas tarefas</h4>
+					<hr />
+					<label for="ordenacao">Ordenar por:</label>
+					<select id="ordenacao" onchange="ordenarTarefas(this.value)">
+						<option value="">Selecione uma opção</option>
+						<option value="data_criacao_recente">Mais recentes primeiro</option>
+						<option value="data_criacao_antigas">Mais antigas primeiro</option>
+					</select>
+				`;
+						tarefasContainer.appendChild(ordenacaoElement);
+
+						data.forEach(tarefa => {
+							const tarefaElement = document.createElement('div');
+							tarefaElement.className = 'row mb-3 d-flex align-items-center tarefa';
+							tarefaElement.innerHTML = `
                     <div class="col-sm-9" id="tarefa_${tarefa.id}">
                         ${tarefa.tarefa} (${tarefa.status})
                     </div>
@@ -104,10 +117,51 @@ require 'tarefa_controller.php';
                         ` : ''}
                     </div>
                 `;
-						tarefasContainer.appendChild(tarefaElement);
-					});
-				})
-				.catch(error => console.error('Erro ao recuperar as tarefas:', error));
+							tarefasContainer.appendChild(tarefaElement);
+						});
+					})
+					.catch(error => console.error('Erro ao recuperar as tarefas:', error));
+			} else if (criterio === 'data_criacao_antigas') {
+
+				fetch('tarefa_controller.php?acao=data_criacao_antigas')
+					.then(response => response.json())
+					.then(data => {
+						const tarefasContainer = document.querySelector('.col');
+						tarefasContainer.innerHTML = '';
+
+						const ordenacaoElement = document.createElement('div');
+						ordenacaoElement.innerHTML = `
+					<h4>Todas tarefas</h4>
+					<hr />
+					<label for="ordenacao">Ordenar por:</label>
+					<select id="ordenacao" onchange="ordenarTarefas(this.value)">
+						<option value="">Selecione uma opção</option>
+						<option value="data_criacao_recente">Mais recentes primeiro</option>
+						<option value="data_criacao_antigas">Mais antigas primeiro</option>
+					</select>
+				`;
+						tarefasContainer.appendChild(ordenacaoElement);
+
+						data.forEach(tarefa => {
+							const tarefaElement = document.createElement('div');
+							tarefaElement.className = 'row mb-3 d-flex align-items-center tarefa';
+							tarefaElement.innerHTML = `
+                    <div class="col-sm-9" id="tarefa_${tarefa.id}">
+                        ${tarefa.tarefa} (${tarefa.status})
+                    </div>
+                    <div class="col-sm-3 mt-2 d-flex justify-content-between">
+                        <i class="fas fa-trash-alt fa-lg text-danger" onclick="remover(${tarefa.id})"></i>
+                        ${tarefa.status === 'pendente' ? `
+                            <i class="fas fa-edit fa-lg text-info" onclick="editar(${tarefa.id}, '${tarefa.tarefa}')"></i>
+                            <i class="fas fa-check-square fa-lg text-success" onclick="marcarRealizada(${tarefa.id})"></i>
+                        ` : ''}
+                    </div>
+                `;
+							tarefasContainer.appendChild(tarefaElement);
+						});
+					})
+					.catch(error => console.error('Erro ao recuperar as tarefas:', error));
+			}
 		}
 	</script>
 </head>
@@ -142,6 +196,7 @@ require 'tarefa_controller.php';
 							<select id="ordenacao" onchange="ordenarTarefas(this.value)">
 								<option value="">Selecione uma opção</option>
 								<option value="data_criacao_recente">Mais recentes primeiro</option>
+								<option value="data_criacao_antigas">Mais antigas primeiro</option>
 							</select>
 							<?php foreach ($tarefas as $indice => $tarefa) { ?>
 								<div class="row mb-3 d-flex align-items-center tarefa">

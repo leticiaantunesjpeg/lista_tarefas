@@ -92,13 +92,26 @@ class TarefaService
 		return $stmt->fetchAll(PDO::FETCH_OBJ);
 	}
 
-	public function ordenarPorDataCadastro()
+	public function ordenarPorRecentes()
 	{
 		$query = '
         SELECT t.id, s.status, t.tarefa, t.data_cadastrado 
 		FROM tb_tarefas AS t
 		LEFT JOIN tb_status AS s ON t.id_status = s.id
 		ORDER BY t.data_cadastrado DESC
+
+    ';
+		$stmt = $this->conexao->prepare($query);
+		$stmt->execute();
+		return $stmt->fetchAll(PDO::FETCH_OBJ);
+	}
+	public function ordenarPorAntigas()
+	{
+		$query = '
+        SELECT t.id, s.status, t.tarefa, t.data_cadastrado 
+		FROM tb_tarefas AS t
+		LEFT JOIN tb_status AS s ON t.id_status = s.id
+		ORDER BY t.data_cadastrado ASC
 
     ';
 		$stmt = $this->conexao->prepare($query);
